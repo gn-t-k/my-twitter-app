@@ -7,6 +7,7 @@ import "source-map-support/register";
 
 async function main() {
   console.log("hello");
+  console.log(process.argv);
 }
 
 main();
