@@ -18,10 +18,17 @@ const main = async () => {
     accessToken,
     accessSecret,
   });
+  const readOnlyClient = client.readOnly;
 
-  const foundUsers = await client.v1.searchUsers("test");
+  const tweets = await readOnlyClient.v2.search("プラハチャレンジ", {
+    expansions: ["author_id"],
+  });
+  const authorIDList = tweets.data.data
+    .map((data) => data.author_id)
+    .flatMap((data) => (data === undefined ? [] : data));
+  const users = await client.v2.users(authorIDList);
 
-  console.log({ foundUsers });
+  console.log(users.data.map((data) => data.username));
 };
 
 main();
