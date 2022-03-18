@@ -40,7 +40,7 @@ const main = async () => {
   if (args[0] === "user") {
     await seachUserByWord(args[1]);
   } else {
-    console.log("no command");
+    console.log("invalid command");
   }
 };
 
