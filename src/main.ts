@@ -23,7 +23,7 @@ const seachUserByWord = async (word: string) => {
     max_results: 100,
   });
   if (tweets.data.meta.result_count === 0) {
-    console.log("no user found");
+    console.log("user not found");
   } else {
     const authorIDList = tweets.data.data
       .map((data) => data.author_id)
