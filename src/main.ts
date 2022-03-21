@@ -17,7 +17,7 @@ const client = new Twitter({
 });
 const readOnlyClient = client.readOnly;
 
-const seachUserByWord = async (word: string) => {
+const searchUserByWord = async (word: string) => {
   const tweets = await readOnlyClient.v2.search(word, {
     expansions: ["author_id"],
     max_results: 100,
@@ -34,13 +34,26 @@ const seachUserByWord = async (word: string) => {
   }
 };
 
+const getFollowers = async (userID: string) => {
+  const user = await readOnlyClient.v2.userByUsername(userID);
+  const followers = await readOnlyClient.v2.followers(user.data.id);
+
+  console.log(followers);
+};
+
 const main = async () => {
   const args = process.argv.slice(2);
 
-  if (args[0] === "user") {
-    await seachUserByWord(args[1]);
-  } else {
-    console.log("invalid command");
+  switch (args[0]) {
+    case "users":
+      await searchUserByWord(args[1]);
+      break;
+    case "followers":
+      await getFollowers(args[1]);
+      break;
+    default:
+      console.log("invalid command");
+      break;
   }
 };
 
