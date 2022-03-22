@@ -22,23 +22,37 @@ const searchUserByWord = async (word: string) => {
     expansions: ["author_id"],
     max_results: 100,
   });
-  if (tweets.data.meta.result_count === 0) {
-    console.log("user not found");
+
+  if (tweets.data.errors) {
+    console.log(tweets.data.errors);
   } else {
     const authorIDList = tweets.data.data
       .map((data) => data.author_id)
       .flatMap((data) => (data === undefined ? [] : [data]));
     const users = await client.v2.users(authorIDList);
 
-    console.log(users.data.map((data) => data.username));
+    if (users.errors) {
+      console.log(users.errors);
+    } else {
+      console.log(users.data);
+    }
   }
 };
 
 const getFollowers = async (userID: string) => {
   const user = await readOnlyClient.v2.userByUsername(userID);
-  const followers = await readOnlyClient.v2.followers(user.data.id);
 
-  console.log(followers);
+  if (user.errors) {
+    console.log(user.errors);
+  } else {
+    const followers = await readOnlyClient.v2.followers(user.data.id);
+
+    if (followers.errors) {
+      console.log(followers.errors);
+    } else {
+      console.log(followers.data);
+    }
+  }
 };
 
 const main = async () => {
