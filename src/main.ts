@@ -3,6 +3,12 @@ import "source-map-support/register";
 import "dotenv/config.js";
 
 import Twitter from "twitter-api-v2";
+import { searchUserByWord } from "./functions/search-user-by-word";
+import {
+  getTweetListByWord,
+  getUserListByUserIDList,
+} from "./apis/twitter-api";
+import { Result } from "./types/result";
 
 const appKey = process.env.API_KEY ?? "";
 const appSecret = process.env.API_KEY_SECRET ?? "";
@@ -17,26 +23,12 @@ const client = new Twitter({
 });
 const readOnlyClient = client.readOnly;
 
-const searchUserByWord = async (word: string) => {
-  const tweets = await readOnlyClient.v2.search(word, {
-    expansions: ["author_id"],
-    max_results: 100,
-  });
+const logResult = async (
+  promiseResult: Promise<Result<unknown, unknown>>
+): Promise<void> => {
+  const result = await promiseResult;
 
-  if (tweets.data.errors) {
-    console.log(tweets.data.errors);
-  } else {
-    const authorIDList = tweets.data.data
-      .map((data) => data.author_id)
-      .flatMap((data) => (data === undefined ? [] : [data]));
-    const users = await client.v2.users(authorIDList);
-
-    if (users.errors) {
-      console.log(users.errors);
-    } else {
-      console.log(users.data);
-    }
-  }
+  console.log(result.value);
 };
 
 const getFollowers = async (userID: string) => {
@@ -60,7 +52,12 @@ const main = async () => {
 
   switch (args[0]) {
     case "users":
-      await searchUserByWord(args[1]);
+      logResult(
+        searchUserByWord(
+          { word: args[1] },
+          { getTweetListByWord, getUserListByUserIDList }
+        )
+      );
       break;
     case "followers":
       await getFollowers(args[1]);
