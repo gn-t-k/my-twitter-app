@@ -1,7 +1,9 @@
 import Twitter from "twitter-api-v2";
 import { Failure, Success } from "../types/result";
 import {
+  IGetFollowerByUserID,
   IGetTweetListByWord,
+  IGetUserByUserName,
   IGetUserListByUserIDList,
 } from "../types/twitter-api";
 
@@ -47,7 +49,7 @@ export const getUserListByUserIDList: IGetUserListByUserIDList = async (
     ? new Success(
         userList.data.map((user) => ({
           id: user.id,
-          userID: user.username,
+          userName: user.username,
           name: user.name,
           description: user.description,
         }))
@@ -55,4 +57,35 @@ export const getUserListByUserIDList: IGetUserListByUserIDList = async (
     : new Failure(
         userList.errors?.map((error) => error.detail) ?? ["unknown error"]
       );
+};
+
+export const getUserByUserName: IGetUserByUserName = async (userName) => {
+  const user = await readOnlyClient.v2.userByUsername(userName);
+
+  return user.errors === undefined || user.errors?.length === 0
+    ? new Success({
+        id: user.data.id,
+        userName,
+        name: user.data.name,
+        description: user.data.description,
+      })
+    : new Failure(
+        user.errors?.map((error) => error.detail) ?? ["unknown error"]
+      );
+};
+
+export const getFollowerByUserID: IGetFollowerByUserID = async (userID) => {
+  const follower = await readOnlyClient.v2.followers(userID);
+
+  return follower.errors === undefined || follower.errors.length === 0
+    ? new Success({
+        followeeUserID: userID,
+        userList: follower.data.map((user) => ({
+          id: user.id,
+          userName: user.username,
+          name: user.name,
+          description: user.description,
+        })),
+      })
+    : new Failure(follower.errors.map((error) => error.detail));
 };

@@ -1,10 +1,11 @@
 import { Result } from "./result";
 
 type UserID = string;
+type UserName = string;
 
 export type User = {
   id: string;
-  userID: UserID;
+  userName: UserName;
   name: string;
   description?: string;
 };
@@ -16,7 +17,7 @@ type Tweet = {
   userID?: UserID;
 };
 
-type Follower = {
+export type Follower = {
   followeeUserID: UserID;
   userList: User[];
 };
@@ -31,6 +32,10 @@ export type IGetUserListByUserIDList = (
   userIDList: UserID[]
 ) => Promise<Result<User[], ErrorList>>;
 
-export type IGetUserByUserID = (userID: UserID) => Promise<User>;
+export type IGetUserByUserName = (
+  userName: UserName
+) => Promise<Result<User, ErrorList>>;
 
-export type IGetFollowerByUserID = (userID: UserID) => Promise<Follower>;
+export type IGetFollowerByUserID = (
+  userID: UserID
+) => Promise<Result<Follower, ErrorList>>;
